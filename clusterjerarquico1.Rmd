@@ -1,0 +1,60 @@
+---
+title: "cluster jerarquico en R"
+author: "Jaime Isaac"
+date: "22/4/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# cluster jerarquico en R
+
+## Introducción Aprenderá la visualización mejorada del dendrograma de agrupamiento con R studio. Este tema cubrirá los siguientes aspectos:
+
+-   Cálculo de la matriz de distancia
+-   Agrupación jerárquica
+-   Personalización de dendrograma
+
+## Datos de importacion
+
+El archivo de datos utilizado aquí se obtiene del conjunto de datos de demostración de R **USArrests.** El uso de la función `head()`imprimirá las primeras seis filas del conjunto de datos `USArrest`s. La función`str ()` muestra la estructura interna del conjunto de datos.  
+
+
+```{r}
+head(USArrests)
+```
+
+```{r}
+str(USArrests)
+```
+
+  
+  
+## Conjunto de datos escalado
+Para escalar los datos, utilice la función scale(). scale es una función genérica cuyo método predeterminado centra y / o escala las columnas de una matriz numérica. Si el argumento center se establece en VERDADERO, el centrado se realiza tomando las desviaciones medias de cada columna. Si scale = TRUE, la escala se realiza dividiendo las columnas de datos (centradas) por sus desviaciones estándar.  
+
+
+```{r}
+data.scaled <- scale(x = USArrests,
+                     center = TRUE,
+                     scale = TRUE)
+head(data.scaled)
+```
+
+  
+  
+##  Cálculo de la matriz de distancia.  
+
+La matriz de distancia se puede calcular usando la función dist (). Esta función calcula y devuelve la matriz de distancia calculada utilizando la medida de distancia especificada para calcular las distancias entre las filas de una matriz de datos. Para ejecutar esta función, asegúrese de que el paquete de estadísticas esté cargado usando la función require ().  
+
+
+
+El argumento x especifica una matriz numérica, un marco de datos o un objeto "dist". El método del segundo argumento especifica la medida de distancia que se utilizará. El método debe ser uno de los siguientes:  
+
+
+"euclidiana", "máximo", "manhattan", "canberra", "binario" o "minkowski"   
+
+
+Calcule los resultados del objeto res.dist como una matriz utilizando la función as.matrix () y especifique el número de filas y columnas que se imprimirán entre corchetes.
