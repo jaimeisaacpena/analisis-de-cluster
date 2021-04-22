@@ -2,16 +2,22 @@
 title: "cluster jerarquico en R"
 author: "Jaime Isaac"
 date: "22/4/2021"
-output: pdf_document
+output: 
+  pdf_document: 
+    fig_caption: yes
+    fig_crop: no
+    keep_tex: yes
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# cluster jerarquico en R
+# cluster jerarquico en R Ejemplo 1
 
-## Introducción Aprenderá la visualización mejorada del dendrograma de agrupamiento con R studio. Este tema cubrirá los siguientes aspectos:
+## Introducción 
+
+Aprenderá la visualización mejorada del dendrograma de agrupamiento con R studio. Este tema cubrirá los siguientes aspectos:
 
 -   Cálculo de la matriz de distancia
 -   Agrupación jerárquica
@@ -57,4 +63,188 @@ El argumento x especifica una matriz numérica, un marco de datos o un objeto "d
 "euclidiana", "máximo", "manhattan", "canberra", "binario" o "minkowski"   
 
 
-Calcule los resultados del objeto res.dist como una matriz utilizando la función as.matrix () y especifique el número de filas y columnas que se imprimirán entre corchetes.
+Calcule los resultados del objeto res.dist como una matriz utilizando la función as.matrix () y especifique el número de filas y columnas que se imprimirán entre corchetes.  
+
+```{r}
+require(stats)
+# Distance matrix computation
+res.dist = dist(x = data.scaled,
+                method = "euclidean")
+# Print distance matrix 
+output = as.matrix(res.dist)[1:6, 1:6]
+round(output, digits = 3)
+```
+
+El método "dist" de as.matrix() y as.dist() se puede utilizar para la conversión entre objetos de la clase "dist" y matrices de distancia convencionales.  
+
+```{r}
+d = as.dist(output)
+d
+```
+## Agrupación jerárquica
+El agrupamiento jerárquico es un análisis de agrupamiento sobre un conjunto de diferencias y métodos para analizarlo. Dicho agrupamiento se realiza mediante el uso de la hclust()función en el paquete de estadísticas .   
+
+
+El argumento despecifica una estructura de disimilitud producida por la dist()función. El segundo argumento es el methodque especifica el método de aglomeración que se utilizará. Debe ser uno de los siguientes:  
+
+
+"ward.D", "ward.D2", "single", "complete", "average" (UPGMA), "mcquitty" (WPGMA), "median" (WPGMC) or "centroid" (UPGMC).  
+
+```{r}
+# Cluster dendrogram using stats package
+require(stats)
+res.hc <- hclust(d = res.dist,
+                 method = "complete")
+plot(x = res.hc)
+```
+Otra forma de visualización mejorada del dendrograma es mediante el uso de factoextrapackage. La función fviz_dend()dibuja fácilmente dendrogramas hermosos utilizando la plot()función o ggplot2()función base R. También proporciona una opción para dibujar un dendrograma circular y árboles filogénicos.  
+
+
+
+El x argumento especifica un objeto de la clase dendrogram, hclust, agnes, diana, hcut, hkmeans o HCPC. El tamaño de las etiquetas y el ancho de la línea del rectángulo se pueden controlar estableciendo el valor de cex y  lwd como argumentos.    
+
+```{r}
+# Cluster dendrogram using factoextra package
+require(factoextra)
+fviz_dend(x = res.hc, cex = 0.7, lwd = 0.7) 
+```
+
+
+### Personalizar dendrograma
+#### Opciones de color
+Los grupos en el dendrograma se pueden asignar con diferentes nombres de color integrados en R. La colors()función devuelve los nombres de colores incorporados que R conoce.  
+
+require(grDevices)
+colors()  
+
+
+Las paletas de gráficos se pueden configurar o visualizar mediante la palette() función. En R, casi siempre es mejor especificar los colores por su nombre. La forma rápida de mostrar colores en un gráfico es mediante la show_col() función.  
+
+```{r}
+require(scales)
+palette()
+show_col(palette(rainbow(6)))
+```
+
+Para ver las paletas de colores inspiradas en gráficos en la pal_jco()función de uso de revista de oncología clínica . El argumento paletteespecifica el tipo de paleta. Actualmente hay una opción disponible default(paleta de 10 colores). El argumento alfa especifica el nivel de transparencia. El valor de este argumento puede estar entre [ Error de procesamiento matemático ]y [ Error de procesamiento matemático ].
+
+```{r}
+require("ggsci")
+show_col(pal_jco(palette = c("default"))(10))
+show_col(pal_jco("default", alpha = 0.6)(10))
+```
+
+
+#### Asignar colores y dibujar rectángulos
+Se pueden agregar colores para el número de grupos o clústeres tanto para líneas como para rectángulos. El argumento k_colorsespecifica un vector que contiene colores que se utilizarán para cada grupo. Los valores permitidos también incluyen "gris" para las paletas de colores grises; paletas de cerveza y paletas de revistas científicas del paquete ggsci R.  
+
+
+ggsci: "Npg", "aaas", "lancet", "jco", "ucscgb", "uchicago", "simpsons" y "rickandmorty"  
+
+
+El argumento rectespecifica un valor lógico que indica si se debe agregar un rectángulo alrededor de los grupos.  
+
+
+Used only when k != NULL.  
+
+El color del borde y el tipo de línea de los rectángulos se pueden personalizar mediante el uso de rect_border argumentos. El rect_filles un argumento lógico si es VERDADERO, llene el rectángulo.  
+
+```{r}
+fviz_dend(x = res.hc, cex = 0.8, lwd = 0.8, k = 4,
+# Manually selected colors
+          k_colors = c("red", "green3", "blue", "magenta"),
+          rect = TRUE, 
+          rect_border = "gray", 
+          rect_fill = FALSE)
+
+```
+
+```{r}
+fviz_dend(x = res.hc, cex = 0.8, lwd = 0.8, k = 4,
+          
+
+# OR JCO fill color for rectangles
+          k_colors = c("jco"),
+          rect = TRUE, 
+          rect_border = "jco", 
+          rect_fill = TRUE)
+```
+
+#### Alineación horizontal
+La alineación del dendrograma se puede cambiar estableciendo un valor lógico para el horizargumento. La configuración TRUEde este argumento dibujará un dendrograma horizontal.  
+
+```{r}
+fviz_dend(res.hc, cex = 0.8, k=4, 
+          rect = TRUE,  
+          k_colors = "jco",
+          rect_border = "jco", 
+          rect_fill = TRUE, 
+          horiz = TRUE)
+```
+
+#### Aplicar temas
+Se pueden aplicar diferentes temas del paquete ggplot2 al dendrograma especificando el valor del ggtheme argumento. El valor predeterminado para este argumento es theme_classic(). Los valores permitidos para este argumento incluyen los siguientes temas oficiales de ggplot2 .   
+
+ggtheme: theme_gray (), theme_bw (), theme_minimal (), theme_classic (), theme_void (),….  
+
+```{r}
+fviz_dend(res.hc, cex = 0.8, lwd = 0.8, k = 4, 
+          rect = TRUE, 
+          k_colors = "jco", 
+          rect_border = "jco", 
+          rect_fill = TRUE,
+          ggtheme = theme_gray())
+```
+#### Cambiar el tipo de dendrograma
+El tipo de dendrograma se puede cambiar estableciendo un valor para el type argumento. Los valores permitidos para este argumento son los siguientes:  
+
+```{r,fig.width=12,fig.height=6}
+#Phylogenic
+library(igraph)
+Phylo = fviz_dend(res.hc, cex = 0.8, lwd = 0.8, k = 4,
+                  rect = TRUE,
+                  k_colors = "jco",
+                  rect_border = "jco",
+                  rect_fill = TRUE,
+                  type = "phylogenic")
+Phylo
+
+
+```
+
+
+
+
+```{r}
+# Circular
+Circ = fviz_dend(res.hc, cex = 0.8, lwd = 0.8, k = 4,
+                 rect = TRUE,
+                 k_colors = "jco",
+                 rect_border = "jco",
+                 rect_fill = TRUE,
+                 type = "circular")
+```
+
+
+#### Diseños filogénicos. 
+
+Se pueden utilizar diferentes diseños para los árboles filogenéticos. Para hacer esto, establezca un valor para el phylo_layoutargumento. El valor predeterminado para este argumento es layout.auto. Los valores permitidos para este argumento incluyen:  
+
+
+phylo_layout: "Layout.auto", "layout_with_drl", "layout_as_tree", "layout.gem", "layout.mds" y "layout_with_lgl"  
+```{r}
+fviz_dend(res.hc, cex = 0.8, lwd = 0.8, k = 4, 
+          rect = TRUE, k_colors = "jco", rect_border = "jco", 
+          rect_fill = TRUE, type = "phylogenic", repel = TRUE,
+# phylo_layout (layout_with_drl)
+          phylo_layout = "layout_with_drl")
+# phylo_layout (layout_as_tree)
+          #phylo_layout = "layout_as_tree"          
+# phylo_layout (layout.gem)
+          #phylo_layout = "layout.gem"
+# phylo_layout (layout.mds)
+          #phylo_layout = "layout.mds"
+# phylo_layout (layout_with_lgl)
+          #phylo_layout = "layout_with_lgl"
+```
+
