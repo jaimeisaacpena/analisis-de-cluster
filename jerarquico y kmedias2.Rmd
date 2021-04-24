@@ -2,29 +2,72 @@
 title: "cluster jerarquico y kmedias 2"
 author: "Jaime Isaac Peña Mejía"
 date: "23/4/2021"
-output: pdf_document
+output:
+  html_document:
+    df_print: paged
+  pdf_document:
+    fig_crop: no
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+# Cluster jerárquico.
+```{r}
 
-## R Markdown
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+clust <- read.table("task9data2.txt", quote="\"", comment.char="")
+clust
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
 ```
 
-## Including Plots
+```{r}
+# Give row names and column names
+cnames <- c("Pais","wine","heart")
+colnames(clust)<-cnames
+rownames(clust)<-clust$Pais
+clust
 
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+```{r}
+# Hierarchical Clustering
+# Create distance matrix
+d <- dist(clust, method = "euclidean") 
+fit <- hclust(d)
+# display dendogram 
+plot(fit)
+```
+
+```{r,fig.height=4,fig.width=6}
+plot(fit)
+groups<-cutree(fit, k=5) # cut tree into 5 clusters
+# draw dendogram with red borders around the 5 clusters 
+rect.hclust(fit,k=3,border="red")
+```
+
+```{r}
+plot(clust$wine,clust$heart)
+text(x=clust$wine, y=clust$heart, labels=clust$country, col=groups)
+```
+```{r}
+#Let's go back to our original dataframe, and add in cluster assignments as a new variable
+Data_Hierarchical <- cbind(clust[,-1],groups)
+print(Data_Hierarchical)
+```
+
+
+# k means en R de forma corta
+```{r}
+# K means
+clustk <- kmeans(clust[,c("wine","heart")], centers=3, nstart=10)
+clustk
+
+plot(clust$wine, clust$heart, xlab="wine", ylab="heart")
+text(x=clust$wine, y=clust$heart, labels=clust$country,col=clustk$cluster+1)
+```
+```{r}
+Data_k <- cbind(clust[,-1],clustk$cluster)
+print(Data_k)
+```
+
